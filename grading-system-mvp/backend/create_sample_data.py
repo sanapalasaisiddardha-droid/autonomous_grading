@@ -41,7 +41,8 @@ students = []
 for student_data in students_data:
     student, created = Student.objects.get_or_create(
         roll_number=student_data['roll_number'],
-        defaults=student_data
+        grade=student_data['grade'],
+        defaults={'name': student_data['name']}
     )
     students.append(student)
     if created:

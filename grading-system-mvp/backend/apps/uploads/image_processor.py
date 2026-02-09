@@ -245,7 +245,7 @@ class ImageProcessor:
 
         return clean
 
-    def _detect_question_numbers_vision(self, image_path, num_questions):
+    def _detect_question_numbers_vision(self, image_path, num_questions, page_boundaries=None):
         """
         Use Google Cloud Vision API document_text_detection() to find
         handwritten question numbers in the left margin of the image.
@@ -271,9 +271,10 @@ class ImageProcessor:
 
             height, width = full_image.shape[:2]
 
-            # Crop left 20% margin — question numbers live here.
-            # Slightly wider than Tesseract's 15% to catch indented numbers.
-            left_width = int(width * 0.20)
+            # Crop left 30% margin — wide enough to capture question labels
+            # on both wide scans (labels at ~5-10%) and narrow scans (labels
+            # near the margin line at ~18-20%).
+            left_width = int(width * 0.30)
             left_margin = full_image[0:height, 0:left_width]
 
             # Encode the cropped margin as PNG bytes for the Vision API
@@ -304,7 +305,7 @@ class ImageProcessor:
             number_pattern = re.compile(r'^(\d{1,2})\.?[)\]:]?$')
             q_pattern = re.compile(r'^[Qq]\.?(\d{1,2})\.?$')
 
-            detections = []  # (question_number, y_center)
+            detections = []  # (question_number, x_center, y_center)
 
             # Skip index 0 (full text block); iterate individual word annotations
             for annotation in annotations[1:]:
@@ -322,28 +323,41 @@ class ImageProcessor:
                         q_num = int(m.group(1))
 
                 if q_num is not None and 1 <= q_num <= num_questions:
-                    # Get y-position from bounding box vertices.
+                    # Get position from bounding box vertices.
                     # Vertices are relative to the cropped image, which has the
                     # same vertical extent as the full image (full height crop).
                     vertices = annotation.bounding_poly.vertices
+                    x_coords = [v.x for v in vertices]
                     y_coords = [v.y for v in vertices]
+                    x_center = (min(x_coords) + max(x_coords)) // 2
                     y_center = (min(y_coords) + max(y_coords)) // 2
-                    detections.append((q_num, y_center))
+
+                    # Hard filter: reject detections in the rightmost 20% of
+                    # the crop — these are clearly answer text, not labels.
+                    if x_center > left_width * 0.80:
+                        continue
+
+                    detections.append((q_num, x_center, y_center))
 
             if not detections:
                 print("Vision API: no question numbers matched in left margin", flush=True)
                 return []
 
             # For each question number, keep the detection with the smallest
-            # (topmost) y-position — the first occurrence is the real label.
+            # (leftmost) x-position. Real question labels are always at the
+            # leftmost text position on their line; answer text numbers (e.g.
+            # "2" from "2.25") are further right.
             from collections import defaultdict
             by_qnum = defaultdict(list)
-            for q_num, y_pos in detections:
-                by_qnum[q_num].append(y_pos)
+            for q_num, x_pos, y_pos in detections:
+                by_qnum[q_num].append((x_pos, y_pos))
 
             seen = {}
-            for q_num, y_positions in by_qnum.items():
-                seen[q_num] = min(y_positions)  # topmost occurrence
+            for q_num, positions in by_qnum.items():
+                # Pick the detection with the smallest (leftmost) x — that's
+                # the real label, not a number from answer text further right.
+                positions.sort(key=lambda p: p[0])  # sort by x ascending
+                seen[q_num] = positions[0][1]  # y of leftmost detection
 
             # Sort by y-position and validate ascending question numbers.
             # This filters out false positives — e.g., the digit "6" in
@@ -374,6 +388,7 @@ class ImageProcessor:
             if missing and len(validated) >= 2:
                 # Build a lookup: question_number -> y_position
                 pos_map = dict(validated)
+                pb_list = page_boundaries or []
 
                 for mq in missing:
                     # Find the nearest detected questions below and above
@@ -381,11 +396,45 @@ class ImageProcessor:
                     upper = [(q, y) for q, y in validated if q > mq]
 
                     if lower and upper:
-                        # Interpolate between the closest lower and upper
                         lq, ly = lower[-1]
                         uq, uy = upper[0]
-                        frac = (mq - lq) / (uq - lq)
-                        interp_y = int(ly + frac * (uy - ly))
+
+                        # Check if a page boundary falls between the anchors
+                        boundary_between = None
+                        for pb in pb_list:
+                            if ly < pb < uy:
+                                boundary_between = pb
+                                break
+
+                        if boundary_between:
+                            # Page-aware interpolation: distribute missing
+                            # questions proportionally between pages rather
+                            # than linearly across the blank page boundary.
+                            total_missing = uq - lq - 1
+                            lower_space = boundary_between - ly
+                            upper_space = uy - boundary_between
+                            total_space = lower_space + upper_space
+
+                            lower_count = max(1, round(
+                                total_missing * lower_space / total_space
+                            )) if total_space > 0 else total_missing // 2
+                            lower_count = min(lower_count, total_missing)
+
+                            offset = mq - lq  # 1-based offset from lower anchor
+                            if offset <= lower_count:
+                                # Place on the lower page
+                                step = lower_space / (lower_count + 1)
+                                interp_y = int(ly + step * offset)
+                            else:
+                                # Place on the upper page
+                                upper_count = total_missing - lower_count
+                                upper_offset = offset - lower_count
+                                step = upper_space / (upper_count + 1)
+                                interp_y = int(boundary_between + step * upper_offset)
+                        else:
+                            # Standard linear interpolation (no page boundary)
+                            frac = (mq - lq) / (uq - lq)
+                            interp_y = int(ly + frac * (uy - ly))
                     elif lower:
                         # Extrapolate after the last detected
                         lq, ly = lower[-1]
@@ -420,7 +469,7 @@ class ImageProcessor:
             traceback.print_exc()
             return []
 
-    def _detect_question_numbers(self, image_path, num_questions):
+    def _detect_question_numbers(self, image_path, num_questions, page_boundaries=None):
         """
         Detect question number labels in the image using OCR.
 
@@ -433,6 +482,7 @@ class ImageProcessor:
         Args:
             image_path: Path to the stitched answer sheet image
             num_questions: Expected number of questions
+            page_boundaries: List of y-positions where pages meet (for interpolation)
 
         Returns:
             list of (question_number, y_position) tuples sorted by y,
@@ -440,7 +490,9 @@ class ImageProcessor:
         """
         # --- Try Vision API first (handles handwriting much better) ---
         if self.client:
-            vision_results = self._detect_question_numbers_vision(image_path, num_questions)
+            vision_results = self._detect_question_numbers_vision(
+                image_path, num_questions, page_boundaries=page_boundaries
+            )
             if len(vision_results) >= num_questions * 0.5:
                 # Vision API found a reasonable number of questions — use it
                 return vision_results
@@ -672,15 +724,30 @@ class ImageProcessor:
             height, width = image.shape[:2]
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
+            # Remove ruled lines before gap detection — on lined/ruled paper,
+            # horizontal lines prevent whitespace detection. Removing them first
+            # reveals the actual blank gaps between question answers.
+            clean_gray = self._remove_ruled_lines(gray)
+
             # Minimum gap height scales with image size
             min_gap = max(20, height // 200)
-            gaps = self._find_whitespace_gaps(gray, min_gap_height=min_gap)
+            gaps = self._find_whitespace_gaps(clean_gray, min_gap_height=min_gap)
             gap_centers = np.array([g[0] for g in gaps]) if gaps else np.array([])
 
             needed = num_questions - 1
 
+            # Compute page boundaries for page-aware interpolation
+            page_boundary_list = []
+            if page_heights and len(page_heights) > 1:
+                cumulative = 0
+                for ph in page_heights[:-1]:
+                    cumulative += ph
+                    page_boundary_list.append(cumulative)
+
             # --- Strategy 1: OCR-based question detection ---
-            ocr_questions = self._detect_question_numbers(image_path, num_questions)
+            ocr_questions = self._detect_question_numbers(
+                image_path, num_questions, page_boundaries=page_boundary_list
+            )
 
             # Accept if we detected at least 75% of questions (with
             # interpolation the list may already be complete).

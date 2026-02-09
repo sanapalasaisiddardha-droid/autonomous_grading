@@ -47,7 +47,14 @@ const Sidebar = ({ onCollapseChange }) => {
             <button
               key={item.path}
               className={`sb-nav-item ${isActive(item.path) ? 'active' : ''}`}
-              onClick={() => navigate(item.path)}
+              onClick={() => {
+                if (item.path === '/' && location.pathname === '/') {
+                  // Already on home — force classes view reset
+                  navigate('/', { state: { resetToClasses: true }, replace: true });
+                } else {
+                  navigate(item.path);
+                }
+              }}
               title={item.label}
             >
               <Icon className="sb-nav-icon" />

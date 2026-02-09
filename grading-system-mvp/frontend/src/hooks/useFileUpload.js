@@ -64,7 +64,7 @@ const useFileUpload = ({ students = [], grade = '', onToast }) => {
           continue;
         }
 
-        const student = students.find(s => s.roll_number === rollNumber);
+        const student = students.find(s => s.roll_number === rollNumber && s.grade === grade);
 
         finalValid.push({
           file,

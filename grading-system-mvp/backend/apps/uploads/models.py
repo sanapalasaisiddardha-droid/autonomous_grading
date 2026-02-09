@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 import uuid
 
 class Submission(models.Model):
@@ -41,3 +43,10 @@ class AnswerSheet(models.Model):
 
     def __str__(self):
         return f"{self.submission.student.name} - Q{self.question.question_number}"
+
+
+@receiver(pre_delete, sender=AnswerSheet)
+def delete_answer_sheet_image(sender, instance, **kwargs):
+    """Delete the image file from disk when an AnswerSheet is deleted."""
+    if instance.image:
+        instance.image.delete(save=False)

@@ -41,6 +41,12 @@ const TestSelection = () => {
   }, []);
 
   useEffect(() => {
+    if (location.state?.resetToClasses) {
+      handleBackToClasses();
+      // Clear the state so it doesn't keep resetting
+      window.history.replaceState({}, '');
+      return;
+    }
     if (location.state?.returnToClass) {
       const className = location.state.returnToClass;
       setSelectedClass(className);

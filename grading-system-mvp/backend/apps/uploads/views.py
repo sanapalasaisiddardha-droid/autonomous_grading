@@ -66,10 +66,10 @@ class SubmissionViewSet(viewsets.ModelViewSet):
             except Student.DoesNotExist:
                 pass  # Will try to find/create by roll_number
 
-        # If not found by student_id, try by roll_number
+        # If not found by student_id, try by roll_number within the same grade
         if not student and roll_number:
             try:
-                student = Student.objects.get(roll_number=roll_number)
+                student = Student.objects.get(roll_number=roll_number, grade=test.grade)
             except Student.DoesNotExist:
                 # Create new student with roll_number
                 student = Student.objects.create(
@@ -152,15 +152,24 @@ class SubmissionViewSet(viewsets.ModelViewSet):
                         _, buffer = cv2.imencode('.jpg', question_image_array)
                         image_content = ContentFile(buffer.tobytes())
 
-                        # Create filename for extracted section
-                        filename = f"q{question.question_number}_{student.roll_number}.jpg"
+                        # Timestamp in filename for cache-busting on re-upload
+                        ts = int(datetime.now().timestamp())
+                        filename = f"q{question.question_number}_{student.roll_number}_{ts}.jpg"
+
+                        # Delete old image file from disk before saving new one
+                        try:
+                            old_sheet = AnswerSheet.objects.get(submission=submission, question=question)
+                            if old_sheet.image:
+                                old_sheet.image.delete(save=False)
+                        except AnswerSheet.DoesNotExist:
+                            pass
 
                         # Create answer sheet for each question
                         answer_sheet, _ = AnswerSheet.objects.update_or_create(
                             submission=submission,
                             question=question,
                             defaults={
-                                'image': None,  # Will be set below
+                                'image': None,
                                 'quality_score': quality_score,
                                 'confidence_level': confidence_level,
                                 'processed_at': datetime.now()
@@ -201,7 +210,16 @@ class SubmissionViewSet(viewsets.ModelViewSet):
                         if idx < len(question_images):
                             _, buffer = cv2.imencode('.jpg', question_images[idx])
                             image_content = ContentFile(buffer.tobytes())
-                            filename = f"q{question.question_number}_{student.roll_number}.jpg"
+                            ts = int(datetime.now().timestamp())
+                            filename = f"q{question.question_number}_{student.roll_number}_{ts}.jpg"
+
+                            # Delete old image file from disk
+                            try:
+                                old_sheet = AnswerSheet.objects.get(submission=submission, question=question)
+                                if old_sheet.image:
+                                    old_sheet.image.delete(save=False)
+                            except AnswerSheet.DoesNotExist:
+                                pass
 
                             answer_sheet, _ = AnswerSheet.objects.update_or_create(
                                 submission=submission,
@@ -257,6 +275,14 @@ class SubmissionViewSet(viewsets.ModelViewSet):
                             test_id=test_id,
                             question_number=question_number
                         )
+
+                        # Delete old image file from disk
+                        try:
+                            old_sheet = AnswerSheet.objects.get(submission=submission, question=question)
+                            if old_sheet.image:
+                                old_sheet.image.delete(save=False)
+                        except AnswerSheet.DoesNotExist:
+                            pass
 
                         answer_sheet, _ = AnswerSheet.objects.update_or_create(
                             submission=submission,
