@@ -1,0 +1,810 @@
+/* ============================================
+   Create Test Page — Clean Modern UI
+   ============================================ */
+
+.ct-page {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+/* ============================================
+   Top Bar
+   ============================================ */
+.ct-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.ct-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ct-back:hover {
+  color: #0891b2;
+  border-color: #0891b2;
+  background: #f8fafc;
+}
+
+.ct-back svg {
+  font-size: 16px;
+}
+
+/* ============================================
+   Stepper
+   ============================================ */
+.ct-stepper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ct-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ct-step.active {
+  color: #0f172a;
+}
+
+.ct-step.done {
+  color: #10b981;
+}
+
+.ct-step-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #94a3b8;
+  border: 2px solid #e2e8f0;
+}
+
+.ct-step.active .ct-step-dot {
+  background: #0891b2;
+  color: white;
+  border-color: #0891b2;
+}
+
+.ct-step.done .ct-step-dot {
+  background: #10b981;
+  color: white;
+  border-color: #10b981;
+  font-size: 16px;
+}
+
+.ct-step-line {
+  width: 48px;
+  height: 2px;
+  background: #e2e8f0;
+  border-radius: 1px;
+}
+
+/* ============================================
+   Top Bar Actions
+   ============================================ */
+.ct-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ============================================
+   Shared Buttons
+   ============================================ */
+.ct-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: #0891b2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ct-btn-primary:hover:not(:disabled) {
+  background: #0e7490;
+}
+
+.ct-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ct-btn-primary svg {
+  font-size: 16px;
+}
+
+.ct-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: white;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ct-btn-outline:hover {
+  color: #0891b2;
+  border-color: #0891b2;
+  background: #fafafe;
+}
+
+/* ============================================
+   Content Area
+   ============================================ */
+.ct-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 32px;
+}
+
+.ct-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 28px;
+  align-items: start;
+}
+
+.ct-form-col {
+  min-width: 0;
+}
+
+.ct-preview-col {
+  min-width: 0;
+}
+
+/* ============================================
+   Error
+   ============================================ */
+.ct-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  color: #dc2626;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.ct-error svg {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   Cards
+   ============================================ */
+.ct-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 28px;
+  margin-bottom: 20px;
+}
+
+.ct-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.ct-card-icon {
+  font-size: 20px;
+  color: #0891b2;
+}
+
+.ct-card-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  flex: 1;
+}
+
+.ct-card-badge {
+  padding: 4px 12px;
+  background: #f1f5f9;
+  color: #64748b;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ============================================
+   Form Fields
+   ============================================ */
+.ct-field {
+  margin-bottom: 18px;
+}
+
+.ct-field label {
+  display: block;
+  margin-bottom: 6px;
+  color: #475569;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.ct-required {
+  color: #ef4444;
+}
+
+.ct-field input,
+.ct-field select,
+.ct-field textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  font-family: inherit;
+  color: #0f172a;
+  line-height: 1.5;
+}
+
+.ct-field textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.ct-field input:focus,
+.ct-field select:focus,
+.ct-field textarea:focus {
+  outline: none;
+  border-color: #0891b2;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.08);
+}
+
+.ct-field input::placeholder,
+.ct-field textarea::placeholder {
+  color: #94a3b8;
+}
+
+.ct-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.ct-field-grow {
+  flex: 1;
+}
+
+/* ============================================
+   Questions
+   ============================================ */
+.ct-questions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ct-question {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 18px;
+}
+
+.ct-question:hover {
+  border-color: #cbd5e1;
+}
+
+.ct-question-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.ct-question-num {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0891b2;
+  background: rgba(8, 145, 178, 0.08);
+  padding: 4px 12px;
+  border-radius: 6px;
+}
+
+.ct-question-marks {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  background: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.ct-marks-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.ct-mark-chip {
+  background: white;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ============================================
+   Preview Actions (below preview card)
+   ============================================ */
+.ct-preview-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.ct-btn-full {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ============================================
+   Preview Card (Sticky Sidebar)
+   ============================================ */
+.ct-sticky {
+  position: sticky;
+  top: 80px;
+}
+
+.ct-preview-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.ct-preview-card h3 {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ct-preview-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ct-preview-item > svg {
+  font-size: 18px;
+  color: #94a3b8;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.ct-preview-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ct-preview-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.ct-preview-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  word-break: break-word;
+}
+
+.ct-preview-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 20px 0;
+}
+
+.ct-preview-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ct-stat {
+  text-align: center;
+  background: #f8fafc;
+  padding: 14px 8px;
+  border-radius: 10px;
+  border: 1px solid #f1f5f9;
+}
+
+.ct-stat-num {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  color: #0891b2;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.ct-stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* ============================================
+   Step 2: Created Summary
+   ============================================ */
+.ct-created-summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.ct-created-icon {
+  font-size: 28px;
+  color: #22c55e;
+  flex-shrink: 0;
+}
+
+.ct-created-summary strong {
+  display: block;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ct-created-summary span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* ============================================
+   Students Panel
+   ============================================ */
+.ct-students-panel {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.ct-students-panel summary {
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+  list-style: none;
+}
+
+.ct-students-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.ct-students-panel summary svg {
+  font-size: 18px;
+  color: #0891b2;
+}
+
+.ct-students-panel summary:hover {
+  background: #f8fafc;
+}
+
+.ct-students-list {
+  padding: 16px 20px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ct-student-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.ct-student-chip strong {
+  color: #0891b2;
+  font-weight: 700;
+}
+
+.ct-no-students {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  color: #92400e;
+  font-size: 13px;
+  width: 100%;
+}
+
+.ct-no-students svg {
+  font-size: 18px;
+  color: #f59e0b;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   Upload Zone
+   ============================================ */
+.ct-upload-zone {
+  background: white;
+  border: 2px dashed #d1d5db;
+  border-radius: 14px;
+  padding: 48px 32px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 24px;
+}
+
+.ct-upload-zone:hover {
+  border-color: #0891b2;
+  background: #fafafe;
+}
+
+.ct-upload-zone.drag-active {
+  border-color: #0891b2;
+  background: #ecfeff;
+}
+
+.ct-upload-icon {
+  font-size: 48px;
+  color: #94a3b8;
+  margin-bottom: 12px;
+}
+
+.ct-upload-zone:hover .ct-upload-icon {
+  color: #0891b2;
+}
+
+.ct-upload-zone h3 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.ct-upload-zone p {
+  margin: 0 0 20px 0;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.ct-upload-browse {
+  margin-top: 4px;
+}
+
+/* ============================================
+   Uploaded Files
+   ============================================ */
+.ct-files-section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.ct-files-section h3 {
+  margin: 0 0 16px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.ct-files-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ct-file-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+}
+
+.ct-file-row.new {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.ct-file-icon {
+  font-size: 24px;
+  color: #0891b2;
+  flex-shrink: 0;
+}
+
+.ct-file-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ct-file-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ct-file-meta {
+  display: block;
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.ct-new-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 6px;
+  padding: 1px 8px;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ct-file-size {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.ct-file-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ct-file-remove:hover {
+  background: #fee2e2;
+  border-color: #ef4444;
+}
+
+.ct-file-remove svg {
+  font-size: 16px;
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 960px) {
+  .ct-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ct-preview-col {
+    order: -1;
+  }
+
+  .ct-sticky {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .ct-topbar {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .ct-stepper {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ct-content {
+    padding: 20px 16px;
+  }
+
+  .ct-card {
+    padding: 20px;
+  }
+
+  .ct-field-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ct-topbar-actions {
+    gap: 8px;
+  }
+}

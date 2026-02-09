@@ -1,0 +1,580 @@
+/* ============================================
+   Test Results Page — Clean Modern UI
+   ============================================ */
+
+.tr-page {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+/* ============================================
+   Top Bar
+   ============================================ */
+.tr-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.tr-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.tr-back:hover {
+  color: #0891b2;
+  border-color: #0891b2;
+  background: #f8fafc;
+}
+
+.tr-back svg {
+  font-size: 16px;
+}
+
+.tr-topbar-title {
+  flex: 1;
+  text-align: center;
+  min-width: 0;
+}
+
+.tr-topbar-title h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.tr-topbar-title p {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.tr-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   Buttons
+   ============================================ */
+.tr-btn-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tr-btn-export:hover {
+  background: #059669;
+}
+
+.tr-btn-export svg {
+  font-size: 16px;
+}
+
+.tr-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: white;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tr-btn-outline:hover {
+  color: #0891b2;
+  border-color: #0891b2;
+  background: #fafafe;
+}
+
+.tr-btn-full {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ============================================
+   Content Area
+   ============================================ */
+.tr-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 32px;
+}
+
+/* ============================================
+   Two-Column Layout
+   ============================================ */
+.tr-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 28px;
+  align-items: start;
+}
+
+.tr-main {
+  min-width: 0;
+}
+
+.tr-sidebar {
+  min-width: 0;
+}
+
+/* ============================================
+   Summary Cards
+   ============================================ */
+.tr-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.tr-summary-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.tr-summary-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.tr-icon-indigo {
+  background: #ecfeff;
+  color: #0891b2;
+}
+
+.tr-icon-cyan {
+  background: #ecfeff;
+  color: #06b6d4;
+}
+
+.tr-icon-green {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+.tr-summary-card > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tr-summary-num {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.1;
+  letter-spacing: -0.3px;
+}
+
+.tr-summary-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ============================================
+   Card (shared)
+   ============================================ */
+.tr-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.tr-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.tr-card-icon {
+  font-size: 20px;
+  color: #0891b2;
+}
+
+.tr-card-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  flex: 1;
+}
+
+.tr-card-badge {
+  padding: 4px 12px;
+  background: #f1f5f9;
+  color: #64748b;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ============================================
+   Results Table
+   ============================================ */
+.tr-table-wrap {
+  overflow-x: auto;
+}
+
+.tr-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tr-table thead {
+  background: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.tr-table th {
+  padding: 14px 12px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.tr-th-center {
+  text-align: center !important;
+}
+
+.tr-table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.tr-table tbody tr:hover {
+  background: rgba(8, 145, 178, 0.03);
+}
+
+.tr-table td {
+  padding: 13px 12px;
+  font-size: 14px;
+  color: #475569;
+}
+
+.tr-cell-roll {
+  font-weight: 700;
+  color: #0891b2;
+  white-space: nowrap;
+}
+
+.tr-cell-marks {
+  text-align: center;
+  font-weight: 500;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.tr-cell-total {
+  text-align: center;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+}
+
+.tr-cell-pct {
+  text-align: center;
+}
+
+/* Percentage Badge */
+.tr-pct-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tr-pct-badge.high {
+  background: #ecfdf5;
+  color: #166534;
+}
+
+.tr-pct-badge.mid {
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.tr-pct-badge.low {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+/* ============================================
+   Info Card (Sticky Sidebar)
+   ============================================ */
+.tr-sticky {
+  position: sticky;
+  top: 80px;
+}
+
+.tr-info-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.tr-info-card h3 {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tr-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.tr-info-item > svg {
+  font-size: 18px;
+  color: #94a3b8;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.tr-info-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tr-info-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.tr-info-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  word-break: break-word;
+}
+
+.tr-info-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 20px 0;
+}
+
+.tr-info-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.tr-stat {
+  text-align: center;
+  background: #f8fafc;
+  padding: 14px 8px;
+  border-radius: 10px;
+  border: 1px solid #f1f5f9;
+}
+
+.tr-stat-num {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  color: #0891b2;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.tr-stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* ============================================
+   Empty State
+   ============================================ */
+.tr-empty {
+  max-width: 420px;
+  margin: 60px auto;
+  text-align: center;
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 48px 32px;
+  border-radius: 14px;
+}
+
+.tr-empty-icon {
+  font-size: 48px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+
+.tr-empty h2 {
+  margin: 0 0 8px;
+  color: #0f172a;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.tr-empty p {
+  margin: 0 0 24px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+/* ============================================
+   Loading State
+   ============================================ */
+.tr-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.tr-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #0891b2;
+  border-radius: 50%;
+  animation: tr-spin 0.7s linear infinite;
+  margin-bottom: 14px;
+}
+
+.tr-loading p {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+@keyframes tr-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 960px) {
+  .tr-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .tr-sidebar {
+    order: -1;
+  }
+
+  .tr-sticky {
+    position: static;
+  }
+
+  .tr-summary {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .tr-topbar {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .tr-topbar-title {
+    order: 3;
+    width: 100%;
+    text-align: left;
+  }
+
+  .tr-topbar-actions {
+    gap: 8px;
+  }
+
+  .tr-content {
+    padding: 20px 16px;
+  }
+
+  .tr-summary {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .tr-summary-card {
+    padding: 16px;
+  }
+
+  .tr-card-header {
+    padding: 16px 18px;
+  }
+
+  .tr-table {
+    min-width: 600px;
+  }
+
+  .tr-info-card {
+    padding: 20px;
+  }
+}

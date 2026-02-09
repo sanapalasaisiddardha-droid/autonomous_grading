@@ -1,0 +1,870 @@
+/* ============================================
+   Test Selection Page — Clean Modern UI
+   ============================================ */
+
+.ts-page {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+/* ============================================
+   Top Bar
+   ============================================ */
+.ts-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.ts-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ts-back:hover {
+  color: #0891b2;
+  border-color: #0891b2;
+  background: #f8fafc;
+}
+
+.ts-back svg {
+  font-size: 16px;
+}
+
+.ts-topbar-title {
+  flex: 1;
+  text-align: center;
+  min-width: 0;
+}
+
+.ts-topbar-title h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.ts-topbar-title p {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.ts-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   Search Bar
+   ============================================ */
+.ts-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ts-search-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 16px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.ts-search-input {
+  padding: 9px 36px 9px 36px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #0f172a;
+  background: #f8fafc;
+  width: 240px;
+  outline: none;
+}
+
+.ts-search-input::placeholder {
+  color: #94a3b8;
+}
+
+.ts-search-input:focus {
+  border-color: #0891b2;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.08);
+}
+
+.ts-search-clear {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: #e2e8f0;
+  border-radius: 50%;
+  color: #64748b;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ts-search-clear:hover {
+  background: #cbd5e1;
+  color: #0f172a;
+}
+
+/* ============================================
+   Shared Buttons
+   ============================================ */
+.ts-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: #0891b2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ts-btn-primary:hover {
+  background: #0e7490;
+}
+
+.ts-btn-primary svg {
+  font-size: 16px;
+}
+
+.ts-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: white;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ts-btn-outline:hover {
+  color: #0891b2;
+  border-color: #0891b2;
+  background: #fafafe;
+}
+
+/* ============================================
+   Content Area
+   ============================================ */
+.ts-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 32px;
+}
+
+/* ============================================
+   Cards (shared)
+   ============================================ */
+.ts-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 28px;
+  margin-bottom: 20px;
+}
+
+.ts-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.ts-card-icon {
+  font-size: 20px;
+  color: #0891b2;
+}
+
+.ts-card-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  flex: 1;
+}
+
+.ts-card-badge {
+  padding: 4px 12px;
+  background: #f1f5f9;
+  color: #64748b;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ============================================
+   Classes Grid
+   ============================================ */
+.ts-classes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.ts-class-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+}
+
+.ts-class-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.ts-class-card-accent {
+  height: 4px;
+  width: 100%;
+}
+
+.ts-class-card-body {
+  padding: 24px;
+}
+
+.ts-class-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.ts-class-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.ts-class-arrow {
+  font-size: 20px;
+  color: #cbd5e1;
+}
+
+.ts-class-card:hover .ts-class-arrow {
+  color: #0891b2;
+}
+
+.ts-class-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #94a3b8;
+}
+
+.ts-class-name {
+  margin: 4px 0 14px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.5px;
+}
+
+.ts-class-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ts-class-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.ts-class-stat svg {
+  font-size: 15px;
+  color: #94a3b8;
+}
+
+/* ============================================
+   Subject Filter
+   ============================================ */
+.ts-subject-filter {
+  padding: 20px 28px;
+}
+
+.ts-subject-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+}
+
+.ts-subject-label svg {
+  font-size: 16px;
+  color: #0891b2;
+}
+
+.ts-subject-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ts-pill {
+  padding: 7px 16px;
+  border: 1.5px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.ts-pill:hover {
+  border-color: #0891b2;
+  color: #0891b2;
+}
+
+.ts-pill.active {
+  background: #0891b2;
+  color: white;
+  border-color: #0891b2;
+}
+
+/* Subject tag on test cards */
+.ts-subject-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  background: rgba(8, 145, 178, 0.08);
+  color: #0891b2 !important;
+  border-radius: 6px;
+  font-weight: 600 !important;
+}
+
+.ts-subject-tag svg {
+  font-size: 13px;
+  color: #0891b2 !important;
+}
+
+/* Empty state for filtered results */
+.ts-empty-filtered {
+  text-align: center;
+  padding: 48px 24px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+.ts-empty-filtered p {
+  color: #64748b;
+  font-size: 15px;
+  margin: 0 0 16px;
+}
+
+/* ============================================
+   Tests List
+   ============================================ */
+.ts-tests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ts-test-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.ts-test-card:hover {
+  border-color: #a5f3fc;
+  box-shadow: 0 2px 12px rgba(8, 145, 178, 0.06);
+}
+
+.ts-test-card-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.ts-test-icon {
+  width: 44px;
+  height: 44px;
+  background: #ecfeff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0891b2;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.ts-test-info {
+  min-width: 0;
+}
+
+.ts-test-info h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px;
+}
+
+.ts-test-meta {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.ts-test-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.ts-test-meta svg {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.ts-test-card-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.ts-test-arrow {
+  font-size: 20px;
+  color: #cbd5e1;
+}
+
+.ts-test-card:hover .ts-test-arrow {
+  color: #0891b2;
+}
+
+/* Delete button */
+.ts-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 16px;
+}
+
+.ts-delete-btn:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #ef4444;
+}
+
+/* ============================================
+   Test Detail — Two Column
+   ============================================ */
+.ts-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 28px;
+  align-items: start;
+}
+
+.ts-detail-main {
+  min-width: 0;
+}
+
+.ts-detail-sidebar {
+  min-width: 0;
+}
+
+/* Questions Grid */
+.ts-questions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+.ts-question-btn {
+  padding: 18px 14px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.ts-question-btn:hover {
+  background: #0891b2;
+  border-color: #0891b2;
+}
+
+.ts-q-num {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.ts-q-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ts-question-btn:hover .ts-q-num,
+.ts-question-btn:hover .ts-q-label {
+  color: white;
+}
+
+/* Detail Actions */
+.ts-detail-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ts-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  color: white;
+}
+
+.ts-action-btn svg {
+  font-size: 18px;
+}
+
+.ts-action-upload {
+  background: #0891b2;
+}
+
+.ts-action-upload:hover {
+  background: #0e7490;
+}
+
+.ts-action-results {
+  background: #10b981;
+}
+
+.ts-action-results:hover {
+  background: #059669;
+}
+
+/* ============================================
+   Info Card (Sticky Sidebar)
+   ============================================ */
+.ts-sticky {
+  position: sticky;
+  top: 80px;
+}
+
+.ts-info-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.ts-info-card h3 {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ts-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ts-info-item > svg {
+  font-size: 18px;
+  color: #94a3b8;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.ts-info-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ts-info-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.ts-info-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  word-break: break-word;
+}
+
+.ts-info-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 20px 0;
+}
+
+.ts-info-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ts-stat {
+  text-align: center;
+  background: #f8fafc;
+  padding: 14px 8px;
+  border-radius: 10px;
+  border: 1px solid #f1f5f9;
+}
+
+.ts-stat-num {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  color: #0891b2;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.ts-stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* ============================================
+   Empty State
+   ============================================ */
+.ts-empty {
+  max-width: 420px;
+  margin: 60px auto;
+  text-align: center;
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 48px 32px;
+  border-radius: 14px;
+}
+
+.ts-empty-icon {
+  font-size: 48px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+
+.ts-empty h2 {
+  margin: 0 0 8px;
+  color: #0f172a;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.ts-empty p {
+  margin: 0 0 24px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+/* ============================================
+   Loading State
+   ============================================ */
+.ts-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.ts-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #0891b2;
+  border-radius: 50%;
+  animation: ts-spin 0.7s linear infinite;
+  margin-bottom: 14px;
+}
+
+.ts-loading p {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+@keyframes ts-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 960px) {
+  .ts-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ts-detail-sidebar {
+    order: -1;
+  }
+
+  .ts-sticky {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .ts-topbar {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .ts-topbar-title {
+    order: 3;
+    width: 100%;
+    text-align: left;
+  }
+
+  .ts-content {
+    padding: 20px 16px;
+  }
+
+  .ts-classes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+  }
+
+  .ts-class-name {
+    font-size: 22px;
+  }
+
+  .ts-test-card {
+    padding: 14px 18px;
+  }
+
+  .ts-test-meta {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .ts-questions-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+
+  .ts-detail-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .ts-card {
+    padding: 20px;
+  }
+
+  .ts-topbar-actions {
+    gap: 8px;
+    order: 4;
+    width: 100%;
+  }
+
+  .ts-search-input {
+    width: 100%;
+    flex: 1;
+  }
+
+  .ts-search {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .ts-classes-grid {
+    grid-template-columns: 1fr;
+  }
+}

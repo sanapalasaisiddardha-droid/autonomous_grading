@@ -1,0 +1,697 @@
+/* ============================================
+   Upload Answers Page — Clean Modern UI
+   ============================================ */
+
+.ua-page {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+/* ============================================
+   Top Bar
+   ============================================ */
+.ua-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.ua-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ua-back:hover {
+  color: #0891b2;
+  border-color: #0891b2;
+  background: #f8fafc;
+}
+
+.ua-back svg {
+  font-size: 16px;
+}
+
+.ua-topbar-title {
+  flex: 1;
+  text-align: center;
+  min-width: 0;
+}
+
+.ua-topbar-title h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.ua-topbar-title p {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.ua-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   Shared Buttons
+   ============================================ */
+.ua-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: #0891b2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ua-btn-primary:hover:not(:disabled) {
+  background: #0e7490;
+}
+
+.ua-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ua-btn-primary svg {
+  font-size: 16px;
+}
+
+.ua-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: white;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ua-btn-outline:hover {
+  color: #0891b2;
+  border-color: #0891b2;
+  background: #fafafe;
+}
+
+/* ============================================
+   Content Area
+   ============================================ */
+.ua-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 32px;
+}
+
+.ua-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 28px;
+  align-items: start;
+}
+
+.ua-form-col {
+  min-width: 0;
+}
+
+.ua-info-col {
+  min-width: 0;
+}
+
+/* ============================================
+   Error
+   ============================================ */
+.ua-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  color: #dc2626;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.ua-error svg {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   Cards
+   ============================================ */
+.ua-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 28px;
+  margin-bottom: 20px;
+}
+
+.ua-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.ua-card-icon {
+  font-size: 20px;
+  color: #0891b2;
+}
+
+.ua-card-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  flex: 1;
+}
+
+.ua-card-badge {
+  padding: 4px 12px;
+  background: #f1f5f9;
+  color: #64748b;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ============================================
+   Form Fields
+   ============================================ */
+.ua-field {
+  margin-bottom: 18px;
+}
+
+.ua-field:last-child {
+  margin-bottom: 0;
+}
+
+.ua-field label {
+  display: block;
+  margin-bottom: 6px;
+  color: #475569;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.ua-field select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  font-family: inherit;
+  color: #0f172a;
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+.ua-field select:focus {
+  outline: none;
+  border-color: #0891b2;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.08);
+}
+
+/* ============================================
+   Students Panel
+   ============================================ */
+.ua-students-panel {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.ua-students-panel summary {
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+  list-style: none;
+}
+
+.ua-students-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.ua-students-panel summary svg {
+  font-size: 18px;
+  color: #0891b2;
+}
+
+.ua-students-panel summary:hover {
+  background: #f8fafc;
+}
+
+.ua-students-list {
+  padding: 16px 20px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ua-student-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.ua-student-chip strong {
+  color: #0891b2;
+  font-weight: 700;
+}
+
+/* ============================================
+   Upload Zone
+   ============================================ */
+.ua-upload-zone {
+  background: white;
+  border: 2px dashed #d1d5db;
+  border-radius: 14px;
+  padding: 48px 32px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.ua-upload-zone:hover {
+  border-color: #0891b2;
+  background: #fafafe;
+}
+
+.ua-upload-zone.drag-active {
+  border-color: #0891b2;
+  background: #ecfeff;
+}
+
+.ua-upload-icon {
+  font-size: 48px;
+  color: #94a3b8;
+  margin-bottom: 12px;
+}
+
+.ua-upload-zone:hover .ua-upload-icon {
+  color: #0891b2;
+}
+
+.ua-upload-zone h3 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.ua-upload-zone p {
+  margin: 0 0 20px 0;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.ua-browse-btn {
+  margin-top: 4px;
+}
+
+/* ============================================
+   Uploaded Files
+   ============================================ */
+.ua-files-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ua-file-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+}
+
+.ua-file-row.new {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.ua-file-icon {
+  font-size: 24px;
+  color: #0891b2;
+  flex-shrink: 0;
+}
+
+.ua-file-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ua-file-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ua-file-meta {
+  display: block;
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.ua-new-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 6px;
+  padding: 1px 8px;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ua-file-size {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.ua-file-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ua-file-remove:hover {
+  background: #fee2e2;
+  border-color: #ef4444;
+}
+
+.ua-file-remove svg {
+  font-size: 16px;
+}
+
+/* ============================================
+   Info Card (Sticky Sidebar)
+   ============================================ */
+.ua-sticky {
+  position: sticky;
+  top: 80px;
+}
+
+.ua-info-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.ua-info-card h3 {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ua-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ua-info-item > svg {
+  font-size: 18px;
+  color: #94a3b8;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.ua-info-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ua-info-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.ua-info-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  word-break: break-word;
+}
+
+.ua-info-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 20px 0;
+}
+
+.ua-info-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ua-stat {
+  text-align: center;
+  background: #f8fafc;
+  padding: 14px 8px;
+  border-radius: 10px;
+  border: 1px solid #f1f5f9;
+}
+
+.ua-stat-num {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  color: #0891b2;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.ua-stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* ============================================
+   Notice
+   ============================================ */
+.ua-notice {
+  display: flex;
+  gap: 10px;
+  padding: 14px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.ua-notice-icon {
+  font-size: 18px;
+  color: #f59e0b;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.ua-notice strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.ua-notice p {
+  margin: 0;
+  font-size: 12px;
+  color: #78350f;
+  line-height: 1.5;
+}
+
+/* ============================================
+   File Types
+   ============================================ */
+.ua-file-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ua-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.ua-type-badge svg {
+  font-size: 14px;
+  color: #0891b2;
+}
+
+/* ============================================
+   Empty State
+   ============================================ */
+.ua-info-empty {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.ua-info-empty-icon {
+  font-size: 40px;
+  color: #cbd5e1;
+  margin-bottom: 12px;
+}
+
+.ua-info-empty h3 {
+  margin: 0 0 8px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.ua-info-empty p {
+  margin: 0;
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 960px) {
+  .ua-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ua-info-col {
+    order: -1;
+  }
+
+  .ua-sticky {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .ua-topbar {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .ua-topbar-title {
+    order: 3;
+    width: 100%;
+    text-align: left;
+  }
+
+  .ua-content {
+    padding: 20px 16px;
+  }
+
+  .ua-card {
+    padding: 20px;
+  }
+
+  .ua-upload-zone {
+    padding: 36px 20px;
+  }
+
+  .ua-topbar-actions {
+    gap: 8px;
+  }
+}
