@@ -21,6 +21,7 @@ const GradingDashboard = () => {
 
   useEffect(() => {
     loadSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [testId, questionNumber]);
 
   const loadSession = async () => {

@@ -304,6 +304,8 @@ class ImageProcessor:
             # or bare "1", "2", "10", also "1)", "2]", etc.
             number_pattern = re.compile(r'^(\d{1,2})\.?[)\]:]?$')
             q_pattern = re.compile(r'^[Qq]\.?(\d{1,2})\.?$')
+            # Handwritten labels: "2C", "3b", "4/5", "1a)" — number + letter/symbol
+            label_pattern = re.compile(r'^(\d{1,2})\s*[a-zA-Z/)\]]')
 
             detections = []  # (question_number, x_center, y_center)
 
@@ -321,6 +323,10 @@ class ImageProcessor:
                     m = q_pattern.match(text)
                     if m:
                         q_num = int(m.group(1))
+                    else:
+                        m = label_pattern.match(text)
+                        if m:
+                            q_num = int(m.group(1))
 
                 if q_num is not None and 1 <= q_num <= num_questions:
                     # Get position from bounding box vertices.
@@ -380,9 +386,12 @@ class ImageProcessor:
             # If we found most questions but some are missing, fill in the
             # gaps by linear interpolation between surrounding detections.
             if len(validated) >= num_questions:
+                self._last_detected_nums = {q for q, _ in validated}
                 return validated
 
             detected_nums = {q for q, _ in validated}
+            # Store detected set on the instance so split code can use it
+            self._last_detected_nums = detected_nums
             missing = [q for q in range(1, num_questions + 1) if q not in detected_nums]
 
             if missing and len(validated) >= 2:
@@ -761,23 +770,95 @@ class ImageProcessor:
                 # Sort by y-position to ensure correct order.
                 sorted_questions = sorted(ocr_questions, key=lambda x: x[1])[:num_questions]
 
-                split_points = [0]
-                for idx in range(1, len(sorted_questions)):
+                # Track which question numbers were directly detected by Vision API
+                detected_set = set()
+                if hasattr(self, '_last_detected_nums'):
+                    detected_set = self._last_detected_nums
+
+                # For Q1, start slightly above its detected position instead of y=0
+                q1_y = sorted_questions[0][1]
+                q1_start = max(0, q1_y - 80)
+                split_points = [q1_start]
+
+                # Group consecutive questions into segments between detected anchors.
+                # For segments with interpolated questions, use gap-based splitting
+                # instead of unreliable interpolated positions.
+                idx = 1
+                while idx < len(sorted_questions):
                     q_num, q_y = sorted_questions[idx]
-                    # The split should be above the question label
-                    target_y = q_y - 50
 
-                    if len(gap_centers) > 0:
-                        # Only look at gaps that are ABOVE the question label
-                        above_mask = gap_centers < q_y
-                        if np.any(above_mask):
-                            above_centers = gap_centers[above_mask]
-                            distances = np.abs(above_centers - target_y)
-                            best_local = int(np.argmin(distances))
-                            if distances[best_local] < snap_tolerance:
-                                target_y = int(above_centers[best_local])
+                    # Check if this is the start of an interpolated segment
+                    if q_num not in detected_set and len(gaps) > 0:
+                        # Find the end of this interpolated segment
+                        seg_start_idx = idx
+                        while (idx < len(sorted_questions) and
+                               sorted_questions[idx][0] not in detected_set):
+                            idx += 1
 
-                    split_points.append(max(0, min(target_y, height - 1)))
+                        # Range: from previous split to next detected question
+                        range_top = split_points[-1]
+                        if idx < len(sorted_questions):
+                            next_q_y = sorted_questions[idx][1]
+                            range_bottom = next_q_y - 50
+                        else:
+                            range_bottom = height
+
+                        # For interpolated questions: use ideal equal-division
+                        # positions, snap each to the nearest gap (unlimited
+                        # distance), but weigh gap height into the score so
+                        # taller gaps win ties. Enforce minimum spacing.
+                        n_splits_needed = idx - seg_start_idx
+                        range_gaps = [(cy, ch) for cy, ch in gaps
+                                      if range_top + 30 < cy < range_bottom - 30]
+
+                        if not range_gaps:
+                            # No gaps — equal division
+                            step = (range_bottom - range_top) / (n_splits_needed + 1)
+                            for k in range(1, n_splits_needed + 1):
+                                split_points.append(int(range_top + step * k))
+                        else:
+                            gap_ys = np.array([g[0] for g in range_gaps])
+                            gap_hs = np.array([g[1] for g in range_gaps])
+                            max_h = float(gap_hs.max()) if len(gap_hs) > 0 else 1.0
+
+                            step = (range_bottom - range_top) / (n_splits_needed + 1)
+                            min_dist = step * 0.35
+                            used_indices = set()
+                            selected = []
+
+                            for k in range(1, n_splits_needed + 1):
+                                ideal_y = range_top + step * k
+                                # Score: penalize distance but reward taller gaps
+                                distances = np.abs(gap_ys - ideal_y)
+                                scores = distances - gap_hs * 3.0
+                                # Exclude used gaps
+                                for u in used_indices:
+                                    scores[u] = 1e9
+                                # Exclude gaps too close to already selected
+                                for s in selected:
+                                    too_close = np.abs(gap_ys - s) < min_dist
+                                    scores[too_close] = 1e9
+
+                                best = int(np.argmin(scores))
+                                selected.append(int(gap_ys[best]))
+                                used_indices.add(best)
+
+                            selected.sort()
+                            split_points.extend(selected)
+                    else:
+                        # Detected question — snap to nearest gap
+                        target_y = q_y - 50
+                        if len(gap_centers) > 0:
+                            above_mask = gap_centers < q_y
+                            if np.any(above_mask):
+                                above_centers = gap_centers[above_mask]
+                                distances = np.abs(above_centers - target_y)
+                                best_local = int(np.argmin(distances))
+                                if distances[best_local] < snap_tolerance:
+                                    target_y = int(above_centers[best_local])
+                        split_points.append(max(0, min(target_y, height - 1)))
+                        idx += 1
+
                 split_points.append(height)
 
                 print(f"Using OCR-based splitting with {len(split_points)-1} sections "
@@ -915,15 +996,13 @@ class ImageProcessor:
                 section_height = height // num_questions
                 split_points = [i * section_height for i in range(num_questions)] + [height]
 
-            # Extract sections with vertical padding so answers aren't clipped.
-            # Padding = 15% of average section height, clamped to image bounds.
-            avg_section_h = height / max(num_questions, 1)
-            pad = int(avg_section_h * 0.15)
-
+            # Extract sections — no overlapping padding between adjacent sections.
+            # Split points are already placed above each question label,
+            # so each section runs from its split to the next split.
             question_images = []
             for i in range(len(split_points) - 1):
-                start_y = max(0, split_points[i] - pad)
-                end_y = min(height, split_points[i + 1] + pad)
+                start_y = split_points[i]
+                end_y = split_points[i + 1]
                 if end_y - start_y < 10:
                     continue
                 section = image[start_y:end_y, 0:width]

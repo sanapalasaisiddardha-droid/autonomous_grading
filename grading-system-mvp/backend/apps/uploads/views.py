@@ -1,6 +1,8 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from .models import Submission, AnswerSheet
 from .serializers import SubmissionSerializer, AnswerSheetSerializer
 from apps.tests.models import Question
@@ -8,15 +10,15 @@ from apps.students.models import Student
 from .image_processor import ImageProcessor
 import random
 import os
+import hashlib
 import tempfile
 from datetime import datetime
-from django.core.files.base import ContentFile
 import cv2
 
 class SubmissionViewSet(viewsets.ModelViewSet):
     queryset = Submission.objects.all()
     serializer_class = SubmissionSerializer
-    
+
     @action(detail=False, methods=['post'])
     def upload_answers(self, request):
         """
@@ -63,6 +65,11 @@ class SubmissionViewSet(viewsets.ModelViewSet):
                         {'error': f'Roll number mismatch for student {student.name}'},
                         status=status.HTTP_400_BAD_REQUEST
                     )
+                # Ensure student belongs to the same grade as the test
+                if student.grade != test.grade:
+                    print(f"⚠️ student_id grade mismatch: student grade={student.grade}, "
+                          f"test grade={test.grade}. Ignoring student_id, will lookup by roll_number.")
+                    student = None  # Force lookup by roll_number + grade
             except Student.DoesNotExist:
                 pass  # Will try to find/create by roll_number
 
@@ -113,13 +120,34 @@ class SubmissionViewSet(viewsets.ModelViewSet):
             if not file_ext:
                 file_ext = '.jpg'
 
+            # Ensure file read pointer is at start (guards against any prior reads)
+            answer_sheet_file.seek(0)
+
             # Save uploaded file temporarily with correct extension
             with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as temp_file:
                 for chunk in answer_sheet_file.chunks():
                     temp_file.write(chunk)
                 temp_path = temp_file.name
 
+            # Debug: log file identity so we can verify the correct file is processed
+            temp_size = os.path.getsize(temp_path)
+            with open(temp_path, 'rb') as f:
+                file_hash = hashlib.md5(f.read()).hexdigest()[:12]
+            print(f"📄 Upload: file='{answer_sheet_file.name}', size={temp_size}, "
+                  f"hash={file_hash}, test={test.test_name}({test.grade}), "
+                  f"student={student.roll_number}({student.grade}), temp={temp_path}",
+                  flush=True)
+
             try:
+                # Delete ALL old answer sheets for this submission before re-extracting.
+                old_sheets = AnswerSheet.objects.filter(submission=submission)
+                old_count = old_sheets.count()
+                if old_count > 0:
+                    old_sheets.delete()
+                    print(f"🗑️ Deleted {old_count} old answer sheets for "
+                          f"{student.roll_number} in {test.test_name}({test.grade})",
+                          flush=True)
+
                 # Initialize image processor
                 processor = ImageProcessor()
 
@@ -142,56 +170,15 @@ class SubmissionViewSet(viewsets.ModelViewSet):
                 quality_score = result.get('quality_score', 0.75)
                 confidence_level = result.get('confidence_level', 'medium')
 
-                if len(question_images) == len(questions):
-                    # Successfully extracted all questions
-                    for idx, question in enumerate(questions):
-                        # Save extracted question image
-                        question_image_array = question_images[idx]
-
-                        # Convert numpy array to image file
-                        _, buffer = cv2.imencode('.jpg', question_image_array)
-                        image_content = ContentFile(buffer.tobytes())
-
-                        # Timestamp in filename for cache-busting on re-upload
-                        ts = int(datetime.now().timestamp())
-                        filename = f"q{question.question_number}_{student.roll_number}_{ts}.jpg"
-
-                        # Delete old image file from disk before saving new one
-                        try:
-                            old_sheet = AnswerSheet.objects.get(submission=submission, question=question)
-                            if old_sheet.image:
-                                old_sheet.image.delete(save=False)
-                        except AnswerSheet.DoesNotExist:
-                            pass
-
-                        # Create answer sheet for each question
-                        answer_sheet, _ = AnswerSheet.objects.update_or_create(
-                            submission=submission,
-                            question=question,
-                            defaults={
-                                'image': None,
-                                'quality_score': quality_score,
-                                'confidence_level': confidence_level,
-                                'processed_at': datetime.now()
-                            }
-                        )
-
-                        # Save the extracted image
-                        answer_sheet.image.save(filename, image_content, save=True)
-                        uploaded_count += 1
-                else:
+                if len(question_images) != len(questions):
                     # Extraction count mismatch — fall back to equal-split
-                    # and save whatever sections we got, or split the image evenly
                     print(f"⚠️ Extracted {len(question_images)} sections but expected "
                           f"{len(questions)}. Falling back to equal split.")
 
-                    # Re-extract with forced equal split if we got nothing
                     if not question_images:
-                        # Read the processed image and split equally
                         import cv2 as cv2_fallback
                         processed_img = cv2_fallback.imread(temp_path) if not processor.is_pdf(temp_path) else None
                         if processed_img is None:
-                            # For PDFs, convert first
                             img_path, _ = processor.convert_pdf_to_image(temp_path)
                             if img_path:
                                 processed_img = cv2_fallback.imread(img_path)
@@ -205,45 +192,34 @@ class SubmissionViewSet(viewsets.ModelViewSet):
                                 for i in range(len(questions))
                             ]
 
-                    # Save whatever images we have
-                    for idx, question in enumerate(questions):
-                        if idx < len(question_images):
-                            _, buffer = cv2.imencode('.jpg', question_images[idx])
-                            image_content = ContentFile(buffer.tobytes())
-                            ts = int(datetime.now().timestamp())
-                            filename = f"q{question.question_number}_{student.roll_number}_{ts}.jpg"
+                    confidence_level = 'low'
 
-                            # Delete old image file from disk
-                            try:
-                                old_sheet = AnswerSheet.objects.get(submission=submission, question=question)
-                                if old_sheet.image:
-                                    old_sheet.image.delete(save=False)
-                            except AnswerSheet.DoesNotExist:
-                                pass
+                # Save ALL extracted images as fresh AnswerSheet records
+                for idx, question in enumerate(questions):
+                    if idx < len(question_images):
+                        _, buffer = cv2.imencode('.jpg', question_images[idx])
+                        image_bytes = buffer.tobytes()
 
-                            answer_sheet, _ = AnswerSheet.objects.update_or_create(
-                                submission=submission,
-                                question=question,
-                                defaults={
-                                    'image': None,
-                                    'quality_score': quality_score,
-                                    'confidence_level': 'low',
-                                    'processed_at': datetime.now()
-                                }
-                            )
-                            answer_sheet.image.save(filename, image_content, save=True)
-                        else:
-                            # No image available for this question
-                            answer_sheet, _ = AnswerSheet.objects.update_or_create(
-                                submission=submission,
-                                question=question,
-                                defaults={
-                                    'quality_score': 0.0,
-                                    'confidence_level': 'low',
-                                    'processed_at': datetime.now()
-                                }
-                            )
-                        uploaded_count += 1
+                        AnswerSheet.objects.create(
+                            submission=submission,
+                            question=question,
+                            image_data=image_bytes,
+                            quality_score=quality_score,
+                            confidence_level=confidence_level,
+                            processed_at=datetime.now()
+                        )
+
+                        print(f"  ✅ Q{question.question_number}: saved to DB "
+                              f"({len(image_bytes)} bytes)", flush=True)
+                    else:
+                        AnswerSheet.objects.create(
+                            submission=submission,
+                            question=question,
+                            quality_score=0.0,
+                            confidence_level='low',
+                            processed_at=datetime.now()
+                        )
+                    uploaded_count += 1
 
             except Exception as e:
                 # Detailed error logging
@@ -264,11 +240,15 @@ class SubmissionViewSet(viewsets.ModelViewSet):
                 if os.path.exists(temp_path):
                     os.remove(temp_path)
         else:
-            # Individual question files
+            # Individual question files — also nuke old sheets first
+            old_sheets = AnswerSheet.objects.filter(submission=submission)
+            if old_sheets.exists():
+                old_sheets.delete()
+
             for key in request.FILES:
                 if key.startswith('question_'):
                     question_number = int(key.split('_')[1])
-                    image = request.FILES[key]
+                    image_file = request.FILES[key]
 
                     try:
                         question = Question.objects.get(
@@ -276,23 +256,16 @@ class SubmissionViewSet(viewsets.ModelViewSet):
                             question_number=question_number
                         )
 
-                        # Delete old image file from disk
-                        try:
-                            old_sheet = AnswerSheet.objects.get(submission=submission, question=question)
-                            if old_sheet.image:
-                                old_sheet.image.delete(save=False)
-                        except AnswerSheet.DoesNotExist:
-                            pass
+                        # Read uploaded file bytes directly into DB
+                        image_bytes = image_file.read()
 
-                        answer_sheet, _ = AnswerSheet.objects.update_or_create(
+                        AnswerSheet.objects.create(
                             submission=submission,
                             question=question,
-                            defaults={
-                                'image': image,
-                                'quality_score': round(random.uniform(0.6, 1.0), 2),
-                                'confidence_level': random.choice(['high', 'medium']),
-                                'processed_at': datetime.now()
-                            }
+                            image_data=image_bytes,
+                            quality_score=round(random.uniform(0.6, 1.0), 2),
+                            confidence_level=random.choice(['high', 'medium']),
+                            processed_at=datetime.now()
                         )
                         uploaded_count += 1
                     except Question.DoesNotExist:
@@ -317,3 +290,11 @@ class SubmissionViewSet(viewsets.ModelViewSet):
 class AnswerSheetViewSet(viewsets.ModelViewSet):
     queryset = AnswerSheet.objects.all()
     serializer_class = AnswerSheetSerializer
+
+
+def serve_answer_image(request, answer_id):
+    """Serve answer sheet image bytes directly from the database."""
+    sheet = get_object_or_404(AnswerSheet, answer_id=answer_id)
+    if not sheet.image_data:
+        return HttpResponse(status=404)
+    return HttpResponse(sheet.image_data, content_type='image/jpeg')

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   HiAcademicCap, HiHome, HiPlus, HiChevronLeft, HiMenuAlt2,
-  HiUpload, HiChartBar, HiCog
+  HiUpload
 } from 'react-icons/hi';
 import './Sidebar.css';
 

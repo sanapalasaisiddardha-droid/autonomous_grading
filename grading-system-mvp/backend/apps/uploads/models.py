@@ -1,6 +1,4 @@
 from django.db import models
-from django.db.models.signals import pre_delete
-from django.dispatch import receiver
 import uuid
 
 class Submission(models.Model):
@@ -26,7 +24,7 @@ class AnswerSheet(models.Model):
     answer_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     submission = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name='answers')
     question = models.ForeignKey('tests.Question', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='answer_sheets/%Y/%m/%d/')
+    image_data = models.BinaryField(null=True, blank=True)
     quality_score = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
     confidence_level = models.CharField(
         max_length=10,
@@ -43,10 +41,3 @@ class AnswerSheet(models.Model):
 
     def __str__(self):
         return f"{self.submission.student.name} - Q{self.question.question_number}"
-
-
-@receiver(pre_delete, sender=AnswerSheet)
-def delete_answer_sheet_image(sender, instance, **kwargs):
-    """Delete the image file from disk when an AnswerSheet is deleted."""
-    if instance.image:
-        instance.image.delete(save=False)

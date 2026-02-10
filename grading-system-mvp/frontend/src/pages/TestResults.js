@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { gradingAPI } from '../services/api';
 import Toast from '../components/Toast';
 import {
   HiArrowLeft, HiDownload, HiUsers, HiClipboardList,
-  HiChartBar, HiDocumentText, HiBookOpen, HiAcademicCap, HiCalendar
+  HiChartBar, HiDocumentText, HiAcademicCap, HiCalendar
 } from 'react-icons/hi';
 import './TestResults.css';
 
 const TestResults = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { testId } = useParams();
   const [loading, setLoading] = useState(true);
   const [results, setResults] = useState(null);
@@ -20,6 +19,7 @@ const TestResults = () => {
     if (testId) {
       loadResults();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [testId]);
 
   const loadResults = async () => {

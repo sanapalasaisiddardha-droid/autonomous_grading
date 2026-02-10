@@ -3,10 +3,10 @@ from .models import Submission, AnswerSheet
 
 class AnswerSheetSerializer(serializers.ModelSerializer):
     question_number = serializers.IntegerField(source='question.question_number', read_only=True)
-    
+
     class Meta:
         model = AnswerSheet
-        fields = '__all__'
+        exclude = ('image_data',)
 
 class SubmissionSerializer(serializers.ModelSerializer):
     answers = AnswerSheetSerializer(many=True, read_only=True)

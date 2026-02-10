@@ -4,7 +4,7 @@ from .models import Submission, AnswerSheet
 class AnswerSheetInline(admin.TabularInline):
     model = AnswerSheet
     extra = 0
-    readonly_fields = ('image', 'quality_score', 'confidence_level')
+    readonly_fields = ('quality_score', 'confidence_level')
 
 @admin.register(Submission)
 class SubmissionAdmin(admin.ModelAdmin):

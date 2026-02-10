@@ -1,5 +1,6 @@
 import hashlib
 import random
+import time
 from django.db import IntegrityError
 from apps.grading.models import StudentAnonymization
 from apps.uploads.models import AnswerSheet
@@ -71,6 +72,7 @@ class AnonymizationService:
             try:
                 answer_sheet = AnswerSheet.objects.get(
                     submission__student=anon.student,
+                    submission__test=session.test,
                     question=session.question
                 )
                 
@@ -78,10 +80,16 @@ class AnonymizationService:
                 from apps.grading.models import Grade
                 grade = Grade.objects.filter(answer_sheet=answer_sheet, session=session).first()
                 
+                # Serve image from DB via API endpoint with cache-buster
+                image_url = None
+                if answer_sheet.image_data:
+                    cache_buster = int(time.time())
+                    image_url = f"/api/uploads/answer-image/{answer_sheet.answer_id}/?t={cache_buster}"
+
                 results.append({
                     'anonymous_code': anon.anonymous_code,
                     'answer_id': str(answer_sheet.answer_id),
-                    'image_url': answer_sheet.image.url if answer_sheet.image else None,
+                    'image_url': image_url,
                     'quality_score': float(answer_sheet.quality_score) if answer_sheet.quality_score else None,
                     'confidence_level': answer_sheet.confidence_level,
                     'ocr_text': answer_sheet.ocr_text,

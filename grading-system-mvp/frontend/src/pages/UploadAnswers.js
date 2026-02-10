@@ -66,10 +66,17 @@ const UploadAnswers = () => {
     }
   };
 
-  const handleTestChange = (e) => {
+  const handleTestChange = async (e) => {
     setSelectedTest(e.target.value);
     clearFiles();
     setError('');
+    // Reload students so newly auto-created students from previous uploads appear
+    try {
+      const studentsData = await gradingAPI.getStudents();
+      setStudents(studentsData.results || studentsData);
+    } catch (err) {
+      console.error('Failed to reload students:', err);
+    }
   };
 
   const handleSubmit = async (e) => {
