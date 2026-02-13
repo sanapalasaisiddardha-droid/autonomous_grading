@@ -15,6 +15,12 @@ const AnnotationCanvas = forwardRef(({
   const [redoStack, setRedoStack] = useState([]);
   const isDrawing = useRef(false);
   const currentStroke = useRef(null);
+  const onStrokeChangeRef = useRef(onStrokeChange);
+  onStrokeChangeRef.current = onStrokeChange;
+
+  const notifyParent = useCallback(() => {
+    if (onStrokeChangeRef.current) onStrokeChangeRef.current();
+  }, []);
 
   // Load initial data
   useEffect(() => {
@@ -130,11 +136,10 @@ const AnnotationCanvas = forwardRef(({
     };
   }, [active, resizeCanvas, getImageElement]);
 
-  // Redraw when strokes change and notify parent
+  // Redraw when strokes change
   useEffect(() => {
     if (active) redrawAll();
-    if (onStrokeChange) onStrokeChange();
-  }, [strokes, active, redrawAll, onStrokeChange]);
+  }, [strokes, active, redrawAll]);
 
   // Find stroke at a point (for eraser)
   const findStrokeAtPoint = useCallback((point, strokeList) => {
@@ -166,6 +171,7 @@ const AnnotationCanvas = forwardRef(({
         newStrokes.splice(idx, 1);
         setStrokes(newStrokes);
         setRedoStack([]);
+        notifyParent();
       }
       return;
     }
@@ -179,7 +185,7 @@ const AnnotationCanvas = forwardRef(({
       opacity,
       points: [pt],
     };
-  }, [tool, color, getNormalizedPoint, getToolProps, findStrokeAtPoint, strokes]);
+  }, [tool, color, getNormalizedPoint, getToolProps, findStrokeAtPoint, strokes, notifyParent]);
 
   const handlePointerMove = useCallback((e) => {
     e.preventDefault();
@@ -195,6 +201,7 @@ const AnnotationCanvas = forwardRef(({
           newStrokes.splice(idx, 1);
           setStrokes(newStrokes);
           setRedoStack([]);
+          notifyParent();
         }
       }
       return;
@@ -213,7 +220,7 @@ const AnnotationCanvas = forwardRef(({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     strokes.forEach(s => drawStroke(ctx, s, canvas.width, canvas.height));
     drawStroke(ctx, currentStroke.current, canvas.width, canvas.height);
-  }, [tool, getNormalizedPoint, findStrokeAtPoint, strokes, drawStroke]);
+  }, [tool, getNormalizedPoint, findStrokeAtPoint, strokes, drawStroke, notifyParent]);
 
   const handlePointerUp = useCallback((e) => {
     e.preventDefault();
@@ -224,9 +231,10 @@ const AnnotationCanvas = forwardRef(({
     if (currentStroke.current.points.length >= 2) {
       setStrokes(prev => [...prev, currentStroke.current]);
       setRedoStack([]);
+      notifyParent();
     }
     currentStroke.current = null;
-  }, []);
+  }, [notifyParent]);
 
   // Expose methods to parent via ref
   useImperativeHandle(ref, () => ({
@@ -240,12 +248,14 @@ const AnnotationCanvas = forwardRef(({
       const last = strokes[strokes.length - 1];
       setStrokes(prev => prev.slice(0, -1));
       setRedoStack(prev => [...prev, last]);
+      notifyParent();
     },
     redo: () => {
       if (redoStack.length === 0) return;
       const last = redoStack[redoStack.length - 1];
       setRedoStack(prev => prev.slice(0, -1));
       setStrokes(prev => [...prev, last]);
+      notifyParent();
     },
     canUndo: () => strokes.length > 0,
     canRedo: () => redoStack.length > 0,
@@ -268,7 +278,7 @@ const AnnotationCanvas = forwardRef(({
         offscreen.toBlob((blob) => resolve(blob), 'image/png');
       });
     },
-  }), [strokes, redoStack, drawStroke, getImageElement]);
+  }), [strokes, redoStack, drawStroke, getImageElement, notifyParent]);
 
   if (!active) return null;
 

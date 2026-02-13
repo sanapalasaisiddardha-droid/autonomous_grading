@@ -26,7 +26,7 @@ const GradingDashboard = () => {
   // Annotation state
   const [canvasMode, setCanvasMode] = useState(false);
   const [activeCanvasId, setActiveCanvasId] = useState(null); // last-touched canvas for toolbar
-  const [annotationDirty, setAnnotationDirty] = useState(false);
+  const [, setAnnotationDirty] = useState(false);
   const [annotationSaving, setAnnotationSaving] = useState(false);
   const [canvasTool, setCanvasTool] = useState('pen');
   const [canvasColor, setCanvasColor] = useState('#ff0000');

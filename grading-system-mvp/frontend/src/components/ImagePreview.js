@@ -47,7 +47,7 @@ const ImagePreview = ({ imageUrl, studentCode, onClose }) => {
             link.download = `${studentCode}_answer.jpg`;
             link.click();
           }}>
-            📥 Download
+             Download
           </button>
           <span className="close-hint">Click outside or press ESC to close</span>
         </div>
