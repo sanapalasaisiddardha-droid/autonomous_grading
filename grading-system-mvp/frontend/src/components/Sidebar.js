@@ -73,9 +73,9 @@ const Sidebar = ({ onCollapseChange }) => {
       <div className="sb-footer">
         {!collapsed && (
           <div className="sb-footer-links">
-            <span>v1.0</span>
-            <span className="sb-footer-dot" />
-            <span>MVP</span>
+            <span>Orchids</span>
+            <span>International</span>
+            <span>School</span>
           </div>
         )}
         <button
