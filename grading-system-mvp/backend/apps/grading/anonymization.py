@@ -38,12 +38,15 @@ class AnonymizationService:
         shuffled_students = random.sample(students, len(students))
 
         # Create anonymization records
+        # Zero-pad the index so codes sort correctly (S01, S02, ... S10, S11)
+        total = len(shuffled_students)
+        pad_width = len(str(total))
         anonymizations = []
         for idx, student in enumerate(shuffled_students, start=1):
             anon = StudentAnonymization(
                 session=session,
                 student=student,
-                anonymous_code=f"S{idx}",
+                anonymous_code=f"S{idx:0{pad_width}d}",
                 randomization_seed=seed
             )
             anonymizations.append(anon)
