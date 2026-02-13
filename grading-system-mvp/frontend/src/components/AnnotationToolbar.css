@@ -1,0 +1,186 @@
+/* ===== Annotation Toolbar — Floating dark bar ===== */
+
+.annotation-toolbar {
+  position: fixed;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 8px 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: at-slide-down 0.2s ease-out;
+}
+
+@keyframes at-slide-down {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Groups */
+.at-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Divider */
+.at-divider {
+  width: 1px;
+  height: 24px;
+  background: #475569;
+  margin: 0 4px;
+}
+
+/* Generic tool button */
+.at-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 8px;
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.at-btn:hover:not(:disabled) {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+.at-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.at-btn--active {
+  background: #0891b2;
+  color: white;
+  border-color: #0891b2;
+}
+
+.at-btn--active:hover:not(:disabled) {
+  background: #0e7490;
+  color: white;
+}
+
+.at-btn span {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Save button */
+.at-btn--save {
+  color: #4ade80;
+}
+
+.at-btn--save:hover:not(:disabled) {
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+}
+
+/* Export button */
+.at-btn--export {
+  color: #60a5fa;
+}
+
+.at-btn--export:hover:not(:disabled) {
+  background: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+}
+
+/* Close button */
+.at-btn--close {
+  color: #f87171;
+}
+
+.at-btn--close:hover:not(:disabled) {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+
+/* Color preset buttons */
+.at-colors {
+  gap: 5px;
+}
+
+.at-color-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.at-color-btn:hover {
+  transform: scale(1.15);
+}
+
+.at-color-btn--active {
+  border-color: white;
+  box-shadow: 0 0 0 2px #0891b2;
+}
+
+.at-color-btn--custom {
+  background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+  color: white;
+  font-weight: 700;
+}
+
+/* Hidden native color input */
+.at-color-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Responsive: shrink on small screens */
+@media (max-width: 768px) {
+  .annotation-toolbar {
+    top: auto;
+    bottom: 80px;
+    padding: 6px 10px;
+    gap: 4px;
+    border-radius: 10px;
+  }
+
+  .at-btn {
+    min-width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .at-btn span {
+    display: none;
+  }
+
+  .at-color-btn {
+    width: 18px;
+    height: 18px;
+  }
+}

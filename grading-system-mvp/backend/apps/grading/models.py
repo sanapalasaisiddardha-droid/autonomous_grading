@@ -51,3 +51,20 @@ class Grade(models.Model):
 
     def __str__(self):
         return f"{self.marks_awarded} marks"
+
+
+class Annotation(models.Model):
+    annotation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    answer_sheet = models.ForeignKey('uploads.AnswerSheet', on_delete=models.CASCADE)
+    session = models.ForeignKey(GradingSession, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE)
+    annotation_data = models.JSONField(default=dict)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('answer_sheet', 'session')
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        return f"Annotation for {self.answer_sheet} in {self.session}"

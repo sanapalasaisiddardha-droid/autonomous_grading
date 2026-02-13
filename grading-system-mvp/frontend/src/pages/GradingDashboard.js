@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { FaPen } from 'react-icons/fa';
 import ImagePreview from '../components/ImagePreview';
 import Toast from '../components/Toast';
+import AnnotationCanvas from '../components/AnnotationCanvas';
+import AnnotationToolbar from '../components/AnnotationToolbar';
+import { jsPDF } from 'jspdf';
 import { gradingAPI } from '../services/api';
 import './GradingDashboard.css';
 
@@ -18,6 +22,16 @@ const GradingDashboard = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [toast, setToast] = useState(null);
   const [savingIds, setSavingIds] = useState(new Set());
+
+  // Annotation state
+  const [canvasMode, setCanvasMode] = useState(false);
+  const [activeCanvasId, setActiveCanvasId] = useState(null); // last-touched canvas for toolbar
+  const [annotationDirty, setAnnotationDirty] = useState(false);
+  const [annotationSaving, setAnnotationSaving] = useState(false);
+  const [canvasTool, setCanvasTool] = useState('pen');
+  const [canvasColor, setCanvasColor] = useState('#ff0000');
+  const [, setToolbarTick] = useState(0); // forces toolbar re-render after drawing
+  const canvasRefs = useRef({});
 
   // Draggable split state (percentage for image side)
   const [imageSplit, setImageSplit] = useState(() => {
@@ -101,6 +115,183 @@ const GradingDashboard = () => {
       });
     }
   }, [savingIds, session]);
+
+  // --- Annotation handlers ---
+  const handleCanvasModeToggle = useCallback(() => {
+    if (canvasMode) {
+      setCanvasMode(false);
+      setActiveCanvasId(null);
+      setAnnotationDirty(false);
+    } else {
+      setCanvasMode(true);
+      setCanvasTool('pen');
+    }
+  }, [canvasMode]);
+
+  const handleAnnotationSave = useCallback(async () => {
+    if (!session) return;
+
+    setAnnotationSaving(true);
+    try {
+      let savedCount = 0;
+      // Save ALL canvases that have strokes
+      for (const answer of answers) {
+        const canvasRef = canvasRefs.current[answer.answer_id];
+        if (!canvasRef || !canvasRef.hasStrokes()) continue;
+
+        const data = canvasRef.getAnnotationData();
+        await gradingAPI.saveAnnotation(session.session_id, answer.answer_id, data);
+        // Update local answer state
+        setAnswers(prev => prev.map(a =>
+          a.answer_id === answer.answer_id ? { ...a, annotation_data: data } : a
+        ));
+        savedCount++;
+      }
+      setAnnotationDirty(false);
+      setToast({ message: `Annotations saved (${savedCount} answer${savedCount !== 1 ? 's' : ''})`, type: 'success' });
+    } catch (err) {
+      setToast({ message: 'Failed to save annotations: ' + err.message, type: 'error' });
+    } finally {
+      setAnnotationSaving(false);
+    }
+  }, [session, answers]);
+
+  const handleAnnotationSaveExport = useCallback(async () => {
+    await handleAnnotationSave();
+    setToast({ message: 'Generating PDF...', type: 'success' });
+
+    const MAX_PX_WIDTH = 1200;
+    const JPEG_QUALITY = 0.6;
+
+    // Downscale + convert to JPEG
+    const compressImage = (srcCanvas) => {
+      let w = srcCanvas.width;
+      let h = srcCanvas.height;
+      if (w > MAX_PX_WIDTH) {
+        h = Math.round(h * (MAX_PX_WIDTH / w));
+        w = MAX_PX_WIDTH;
+      }
+      const out = document.createElement('canvas');
+      out.width = w;
+      out.height = h;
+      out.getContext('2d').drawImage(srcCanvas, 0, 0, w, h);
+      return { dataUrl: out.toDataURL('image/jpeg', JPEG_QUALITY), width: w, height: h };
+    };
+
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const margin = 10;
+    const usableW = pageW - margin * 2;
+    const headerH = 8;
+    const gap = 6;
+    let cursorY = margin;
+    let hasContent = false;
+
+    for (const answer of answers) {
+      if (!answer.image_url) continue;
+
+      // Build source canvas (with annotations if any)
+      let srcCanvas = null;
+      const canvasRef = canvasRefs.current[answer.answer_id];
+
+      if (canvasRef && canvasRef.hasStrokes()) {
+        const blob = await canvasRef.exportMergedImage();
+        if (blob) {
+          const bmp = await createImageBitmap(blob);
+          srcCanvas = document.createElement('canvas');
+          srcCanvas.width = bmp.width;
+          srcCanvas.height = bmp.height;
+          srcCanvas.getContext('2d').drawImage(bmp, 0, 0);
+        }
+      }
+
+      if (!srcCanvas) {
+        const img = document.querySelector(`img[alt="${answer.anonymous_code}"]`);
+        if (img) {
+          // Wait for lazy-loaded images to finish loading
+          if (!img.complete || !img.naturalWidth) {
+            await new Promise(resolve => {
+              img.onload = resolve;
+              img.onerror = resolve;
+              setTimeout(resolve, 3000); // timeout fallback
+            });
+          }
+          if (img.naturalWidth && img.naturalHeight) {
+            srcCanvas = document.createElement('canvas');
+            srcCanvas.width = img.naturalWidth;
+            srcCanvas.height = img.naturalHeight;
+            srcCanvas.getContext('2d').drawImage(img, 0, 0);
+          }
+        }
+      }
+
+      if (!srcCanvas) continue;
+
+      const { dataUrl, width: pxW, height: pxH } = compressImage(srcCanvas);
+      const imgHMm = usableW * (pxH / pxW);
+      const blockH = headerH + imgHMm + gap;
+
+      // New page if this block doesn't fit
+      if (hasContent && cursorY + blockH > pageH - margin) {
+        pdf.addPage();
+        cursorY = margin;
+      }
+
+      hasContent = true;
+
+      // Header
+      pdf.setFontSize(11);
+      pdf.setFont(undefined, 'bold');
+      const label = answer.already_graded
+        ? `${answer.anonymous_code}  -  ${answer.marks_awarded} / ${session.max_marks}`
+        : answer.anonymous_code;
+      pdf.text(label, margin, cursorY + 5);
+      cursorY += headerH;
+
+      // Image
+      pdf.addImage(dataUrl, 'JPEG', margin, cursorY, usableW, imgHMm);
+      cursorY += imgHMm + gap;
+    }
+
+    if (!hasContent) {
+      setToast({ message: 'No images to export', type: 'error' });
+      return;
+    }
+
+    pdf.save(`${session.test_name}_Q${session.question_number}_annotated.pdf`);
+    setToast({ message: 'PDF downloaded', type: 'success' });
+  }, [handleAnnotationSave, answers, session]);
+
+  const handleAnnotationClose = useCallback(() => {
+    setCanvasMode(false);
+    setActiveCanvasId(null);
+    setAnnotationDirty(false);
+  }, []);
+
+  // Keyboard shortcuts for annotation mode
+  useEffect(() => {
+    if (!canvasMode || !activeCanvasId) return;
+    const handler = (e) => {
+      const canvasRef = canvasRefs.current[activeCanvasId];
+      if (!canvasRef) return;
+
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        canvasRef.undo();
+        setAnnotationDirty(true);
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) {
+        e.preventDefault();
+        canvasRef.redo();
+        setAnnotationDirty(true);
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        handleAnnotationSave();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [canvasMode, activeCanvasId, handleAnnotationSave]);
 
   const handleNextQuestion = () => {
     const nextQ = parseInt(questionNumber) + 1;
@@ -207,10 +398,45 @@ const GradingDashboard = () => {
         <div className="gd-topbar">
           <button className="gd-back" onClick={goBack}>← Back</button>
           <div className="gd-topbar-title">{session.test_name}</div>
-          <div className="gd-topbar-badge">
-            Q{session.question_number} · {gradingProgress.graded}/{gradingProgress.total}
+          <div className="gd-topbar-right">
+            <button
+              className={`gd-canvas-mode-btn ${canvasMode ? 'gd-canvas-mode-btn--active' : ''}`}
+              onClick={handleCanvasModeToggle}
+              title={canvasMode ? 'Exit annotation mode' : 'Enter annotation mode'}
+            >
+              <FaPen size={12} />
+              <span>{canvasMode ? 'Canvas ON' : 'Canvas'}</span>
+            </button>
+            <div className="gd-topbar-badge">
+              Q{session.question_number} · {gradingProgress.graded}/{gradingProgress.total}
+            </div>
           </div>
         </div>
+
+        {/* Annotation Toolbar */}
+        {canvasMode && (
+          <AnnotationToolbar
+            tool={canvasTool}
+            color={canvasColor}
+            onToolChange={setCanvasTool}
+            onColorChange={setCanvasColor}
+            onUndo={() => {
+              canvasRefs.current[activeCanvasId]?.undo();
+              setAnnotationDirty(true);
+            }}
+            onRedo={() => {
+              canvasRefs.current[activeCanvasId]?.redo();
+              setAnnotationDirty(true);
+            }}
+            onSave={handleAnnotationSave}
+            onSaveExport={handleAnnotationSaveExport}
+            onClose={handleAnnotationClose}
+            canUndo={canvasRefs.current[activeCanvasId]?.canUndo?.() || false}
+            canRedo={canvasRefs.current[activeCanvasId]?.canRedo?.() || false}
+            hasStrokes={canvasRefs.current[activeCanvasId]?.hasStrokes?.() || false}
+            saving={annotationSaving}
+          />
+        )}
 
         {/* Question Info */}
         <div className="gd-question-card">
@@ -253,8 +479,11 @@ const GradingDashboard = () => {
                   <span className="gd-student-code">{answer.anonymous_code}</span>
                   <div
                     className="gd-image-wrap"
-                    onClick={() => answer.image_url && setPreviewImage(answer)}
-                    title={answer.image_url ? 'Click to enlarge' : ''}
+                    onClick={() => {
+                      if (canvasMode) return; // drawing mode, don't open preview
+                      if (answer.image_url) setPreviewImage(answer);
+                    }}
+                    title={canvasMode ? '' : (answer.image_url ? 'Click to enlarge' : '')}
                   >
                     {answer.image_url ? (
                       <img
@@ -262,10 +491,24 @@ const GradingDashboard = () => {
                         alt={answer.anonymous_code}
                         className="gd-image"
                         loading="lazy"
+                        crossOrigin="anonymous"
                       />
                     ) : (
                       <div className="gd-no-image">No image available</div>
                     )}
+                    <AnnotationCanvas
+                      ref={(el) => { canvasRefs.current[answer.answer_id] = el; }}
+                      imageUrl={answer.image_url ? `http://localhost:8002${answer.image_url}` : null}
+                      active={canvasMode}
+                      tool={canvasTool}
+                      color={canvasColor}
+                      initialData={answer.annotation_data}
+                      onStrokeChange={() => {
+                        setActiveCanvasId(answer.answer_id);
+                        setAnnotationDirty(true);
+                        setToolbarTick(t => t + 1);
+                      }}
+                    />
                   </div>
                 </div>
 

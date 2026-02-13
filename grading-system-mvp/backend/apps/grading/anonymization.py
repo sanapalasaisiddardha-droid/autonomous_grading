@@ -80,8 +80,9 @@ class AnonymizationService:
                 )
                 
                 # Check if already graded
-                from apps.grading.models import Grade
+                from apps.grading.models import Grade, Annotation
                 grade = Grade.objects.filter(answer_sheet=answer_sheet, session=session).first()
+                annotation = Annotation.objects.filter(answer_sheet=answer_sheet, session=session).first()
                 
                 # Serve image from DB via API endpoint with cache-buster
                 image_url = None
@@ -97,7 +98,8 @@ class AnonymizationService:
                     'confidence_level': answer_sheet.confidence_level,
                     'ocr_text': answer_sheet.ocr_text,
                     'marks_awarded': float(grade.marks_awarded) if grade else None,
-                    'already_graded': grade is not None
+                    'already_graded': grade is not None,
+                    'annotation_data': annotation.annotation_data if annotation else None,
                 })
             except AnswerSheet.DoesNotExist:
                 # Student didn't submit this question

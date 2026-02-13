@@ -30,3 +30,8 @@ class GradeSubmissionSerializer(serializers.Serializer):
     answer_id = serializers.UUIDField()
     marks_awarded = serializers.DecimalField(max_digits=4, decimal_places=2)
     flag_for_rescan = serializers.BooleanField(default=False)
+
+class AnnotationSaveSerializer(serializers.Serializer):
+    """Serializer for saving canvas annotations"""
+    answer_id = serializers.UUIDField()
+    annotation_data = serializers.JSONField()

@@ -2,8 +2,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from .models import GradingSession, Grade
-from .serializers import GradingSessionSerializer, GradeSubmissionSerializer
+from .models import GradingSession, Grade, Annotation
+from .serializers import GradingSessionSerializer, GradeSubmissionSerializer, AnnotationSaveSerializer
 from .anonymization import AnonymizationService
 from apps.tests.models import Test, Question
 from apps.uploads.models import AnswerSheet
@@ -209,6 +209,40 @@ class GradingSessionViewSet(viewsets.ModelViewSet):
             'total_students': len(results_list),
             'results': results_list
         })
+
+    @action(detail=True, methods=['post'])
+    def save_annotation(self, request, pk=None):
+        """Save canvas annotation data for an answer sheet"""
+        session = self.get_object()
+        serializer = AnnotationSaveSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        answer_sheet = get_object_or_404(
+            AnswerSheet,
+            answer_id=serializer.validated_data['answer_id']
+        )
+
+        Annotation.objects.update_or_create(
+            answer_sheet=answer_sheet,
+            session=session,
+            defaults={
+                'teacher': session.teacher,
+                'annotation_data': serializer.validated_data['annotation_data'],
+            }
+        )
+
+        return Response({'message': 'Annotation saved'})
+
+    @action(detail=True, methods=['get'])
+    def get_annotations(self, request, pk=None):
+        """Get all annotations for a grading session"""
+        session = self.get_object()
+        annotations = Annotation.objects.filter(session=session)
+        result = {}
+        for ann in annotations:
+            result[str(ann.answer_sheet_id)] = ann.annotation_data
+        return Response({'annotations': result})
 
 class GradeViewSet(viewsets.ReadOnlyModelViewSet):
     """View grades (read-only for now)"""

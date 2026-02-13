@@ -91,6 +91,21 @@ export const gradingAPI = {
     const response = await api.get(`/grading/sessions/test_results/?test_id=${testId}`);
     return response.data;
   },
+
+  // Save annotation data for an answer
+  saveAnnotation: async (sessionId, answerId, annotationData) => {
+    const response = await api.post(`/grading/sessions/${sessionId}/save_annotation/`, {
+      answer_id: answerId,
+      annotation_data: annotationData,
+    });
+    return response.data;
+  },
+
+  // Get all annotations for a session
+  getAnnotations: async (sessionId) => {
+    const response = await api.get(`/grading/sessions/${sessionId}/get_annotations/`);
+    return response.data;
+  },
 };
 
 export default api;

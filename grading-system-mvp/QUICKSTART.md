@@ -5,7 +5,7 @@
 ```bash
 # Terminal 1 - Backend
 cd backend
-python3 -m venv venv
+python3.11 -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 python manage.py makemigrations && python manage.py migrate
