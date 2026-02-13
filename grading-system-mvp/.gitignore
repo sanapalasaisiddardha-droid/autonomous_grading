@@ -14,7 +14,7 @@ media/
 staticfiles/
 .env
 *.log
-
+.mcp.json
 # React
 node_modules/
 build/
