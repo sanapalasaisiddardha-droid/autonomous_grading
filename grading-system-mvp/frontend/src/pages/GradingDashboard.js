@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import ImagePreview from '../components/ImagePreview';
 import Toast from '../components/Toast';
@@ -18,6 +18,14 @@ const GradingDashboard = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [toast, setToast] = useState(null);
   const [savingIds, setSavingIds] = useState(new Set());
+
+  // Draggable split state (percentage for image side)
+  const [imageSplit, setImageSplit] = useState(() => {
+    const saved = localStorage.getItem('gd-split');
+    return saved ? parseFloat(saved) : 65;
+  });
+  const isDragging = useRef(false);
+  const rowRef = useRef(null);
 
   useEffect(() => {
     loadSession();
@@ -120,6 +128,49 @@ const GradingDashboard = () => {
     });
   };
 
+  // --- Drag-to-resize handlers ---
+  const handleDragStart = useCallback((e) => {
+    e.preventDefault();
+    isDragging.current = true;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }, []);
+
+  useEffect(() => {
+    const handleDragMove = (e) => {
+      if (!isDragging.current || !rowRef.current) return;
+      const rect = rowRef.current.getBoundingClientRect();
+      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      const pct = Math.min(85, Math.max(30, (x / rect.width) * 100));
+      setImageSplit(pct);
+    };
+
+    const handleDragEnd = () => {
+      if (!isDragging.current) return;
+      isDragging.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      setImageSplit(prev => {
+        localStorage.setItem('gd-split', prev);
+        return prev;
+      });
+    };
+
+    window.addEventListener('mousemove', handleDragMove);
+    window.addEventListener('mouseup', handleDragEnd);
+    window.addEventListener('touchmove', handleDragMove);
+    window.addEventListener('touchend', handleDragEnd);
+    return () => {
+      window.removeEventListener('mousemove', handleDragMove);
+      window.removeEventListener('mouseup', handleDragEnd);
+      window.removeEventListener('touchmove', handleDragMove);
+      window.removeEventListener('touchend', handleDragEnd);
+    };
+  }, []);
+
+  const scoreSplit = 100 - imageSplit;
+  const isVerticalMarks = scoreSplit < 25;
+
   if (loading) {
     return <div className="gd-loading">Loading grading session...</div>;
   }
@@ -187,7 +238,7 @@ const GradingDashboard = () => {
 
         {/* Student Rows */}
         <div className="gd-rows">
-          {answers.map((answer) => {
+          {answers.map((answer, index) => {
             const isGraded = answer.already_graded;
             const isSaving = savingIds.has(answer.answer_id);
 
@@ -195,9 +246,10 @@ const GradingDashboard = () => {
               <div
                 key={answer.answer_id}
                 className={`gd-row ${isGraded ? 'gd-row--graded' : ''}`}
+                ref={index === 0 ? rowRef : undefined}
               >
                 {/* Left: Student code + image */}
-                <div className="gd-row-left">
+                <div className="gd-row-left" style={{ flex: `0 0 ${imageSplit}%` }}>
                   <span className="gd-student-code">{answer.anonymous_code}</span>
                   <div
                     className="gd-image-wrap"
@@ -217,9 +269,19 @@ const GradingDashboard = () => {
                   </div>
                 </div>
 
+                {/* Drag Handle */}
+                <div
+                  className="gd-drag-handle"
+                  onMouseDown={handleDragStart}
+                  onTouchStart={handleDragStart}
+                  title="Drag to resize"
+                />
+
                 {/* Right: Mark buttons + status */}
-                <div className="gd-row-right">
-                  <div className="gd-marks-grid">
+                <div className={`gd-row-right ${isVerticalMarks ? 'gd-row-right--vertical' : ''}`}
+                  style={{ flex: `0 0 calc(${scoreSplit}% - 10px)` }}
+                >
+                  <div className={`gd-marks-grid ${isVerticalMarks ? 'gd-marks-grid--vertical' : ''}`}>
                     {session.marking_grid.map((mark) => (
                       <button
                         key={mark}

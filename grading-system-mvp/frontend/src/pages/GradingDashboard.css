@@ -153,12 +153,12 @@
 
 /* -- Left side: code + image -- */
 .gd-row-left {
-  flex: 0 0 65%;
   display: flex;
   align-items: flex-start;
   gap: 16px;
   padding: 16px;
   min-width: 0;
+  overflow: hidden;
 }
 
 .gd-student-code {
@@ -199,7 +199,6 @@
   display: block;
   width: 100%;
   height: auto;
-  max-height: 200px;
   object-fit: contain;
 }
 
@@ -210,16 +209,49 @@
   font-size: 14px;
 }
 
+/* -- Drag Handle -- */
+.gd-drag-handle {
+  flex: 0 0 10px;
+  cursor: col-resize;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  position: relative;
+}
+
+.gd-drag-handle::after {
+  content: '';
+  width: 4px;
+  height: 32px;
+  border-radius: 2px;
+  background: #cbd5e1;
+  transition: background 0.15s ease;
+}
+
+.gd-drag-handle:hover {
+  background: #e2e8f0;
+}
+
+.gd-drag-handle:hover::after {
+  background: #0891b2;
+}
+
 /* -- Right side: mark buttons + status -- */
 .gd-row-right {
-  flex: 0 0 35%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 16px;
-  border-left: 1px solid #e2e8f0;
+  border-left: none;
   gap: 12px;
+  min-width: 0;
+}
+
+.gd-row-right--vertical {
+  flex-direction: column;
 }
 
 .gd-row--graded .gd-row-right {
@@ -232,6 +264,11 @@
   flex-wrap: wrap;
   gap: 6px;
   justify-content: center;
+}
+
+.gd-marks-grid--vertical {
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .gd-mark-btn {
@@ -397,14 +434,17 @@
   }
 
   .gd-row-left {
-    flex: none;
+    flex: none !important;
     width: 100%;
   }
 
+  .gd-drag-handle {
+    display: none;
+  }
+
   .gd-row-right {
-    flex: none;
+    flex: none !important;
     width: 100%;
-    border-left: none;
     border-top: 1px solid #e2e8f0;
     padding: 14px 16px;
   }
