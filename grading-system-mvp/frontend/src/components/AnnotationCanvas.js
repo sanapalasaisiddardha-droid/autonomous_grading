@@ -228,12 +228,16 @@ const AnnotationCanvas = forwardRef(({
     if (!isDrawing.current || !currentStroke.current) return;
     isDrawing.current = false;
 
-    if (currentStroke.current.points.length >= 2) {
-      setStrokes(prev => [...prev, currentStroke.current]);
+    // Capture the completed stroke before nulling the ref,
+    // otherwise React's batched updater will see null
+    const completedStroke = currentStroke.current;
+    currentStroke.current = null;
+
+    if (completedStroke.points.length >= 2) {
+      setStrokes(prev => [...prev, completedStroke]);
       setRedoStack([]);
       notifyParent();
     }
-    currentStroke.current = null;
   }, [notifyParent]);
 
   // Expose methods to parent via ref
